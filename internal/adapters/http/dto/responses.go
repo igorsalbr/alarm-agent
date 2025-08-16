@@ -7,41 +7,41 @@ import (
 )
 
 type EventResponse struct {
-	ID                      int        `json:"id"`
-	Title                   string     `json:"title"`
-	Location                *string    `json:"location,omitempty"`
-	StartsAt                time.Time  `json:"starts_at"`
-	RemindBeforeMinutes     int        `json:"remind_before_minutes"`
-	RemindFrequencyMinutes  int        `json:"remind_frequency_minutes"`
-	RequireConfirmation     bool       `json:"require_confirmation"`
-	MaxNotifications        int        `json:"max_notifications"`
-	Status                  string     `json:"status"`
-	NotificationsSent       int        `json:"notifications_sent"`
-	LastNotifiedAt          *time.Time `json:"last_notified_at,omitempty"`
-	CreatedAt               time.Time  `json:"created_at"`
-	UpdatedAt               time.Time  `json:"updated_at"`
+	ID                     int        `json:"id"`
+	Title                  string     `json:"title"`
+	Location               *string    `json:"location,omitempty"`
+	StartsAt               time.Time  `json:"starts_at"`
+	RemindBeforeMinutes    int        `json:"remind_before_minutes"`
+	RemindFrequencyMinutes int        `json:"remind_frequency_minutes"`
+	RequireConfirmation    bool       `json:"require_confirmation"`
+	MaxNotifications       int        `json:"max_notifications"`
+	Status                 string     `json:"status"`
+	NotificationsSent      int        `json:"notifications_sent"`
+	LastNotifiedAt         *time.Time `json:"last_notified_at,omitempty"`
+	CreatedAt              time.Time  `json:"created_at"`
+	UpdatedAt              time.Time  `json:"updated_at"`
 }
 
 type UserResponse struct {
-	ID                              int     `json:"id"`
-	WANumber                        string  `json:"wa_number"`
-	Name                            *string `json:"name,omitempty"`
-	Timezone                        string  `json:"timezone"`
-	DefaultRemindBeforeMinutes      int     `json:"default_remind_before_minutes"`
-	DefaultRemindFrequencyMinutes   int     `json:"default_remind_frequency_minutes"`
-	DefaultRequireConfirmation      bool    `json:"default_require_confirmation"`
-	LLMProvider                     *string `json:"llm_provider,omitempty"`
-	LLMModel                        *string `json:"llm_model,omitempty"`
-	CreatedAt                       time.Time `json:"created_at"`
-	UpdatedAt                       time.Time `json:"updated_at"`
+	ID                            int       `json:"id"`
+	WANumber                      string    `json:"wa_number"`
+	Name                          *string   `json:"name,omitempty"`
+	Timezone                      string    `json:"timezone"`
+	DefaultRemindBeforeMinutes    int       `json:"default_remind_before_minutes"`
+	DefaultRemindFrequencyMinutes int       `json:"default_remind_frequency_minutes"`
+	DefaultRequireConfirmation    bool      `json:"default_require_confirmation"`
+	LLMProvider                   *string   `json:"llm_provider,omitempty"`
+	LLMModel                      *string   `json:"llm_model,omitempty"`
+	CreatedAt                     time.Time `json:"created_at"`
+	UpdatedAt                     time.Time `json:"updated_at"`
 }
 
 type LLMProviderResponse struct {
-	ID          int       `json:"id"`
-	Name        string    `json:"name"`
-	DisplayName string    `json:"display_name"`
-	Description string    `json:"description"`
-	IsActive    bool      `json:"is_active"`
+	ID          int                `json:"id"`
+	Name        string             `json:"name"`
+	DisplayName string             `json:"display_name"`
+	Description string             `json:"description"`
+	IsActive    bool               `json:"is_active"`
 	Models      []LLMModelResponse `json:"models,omitempty"`
 }
 
@@ -74,35 +74,35 @@ type SuccessResponse struct {
 
 func EventToResponse(event *domain.Event) EventResponse {
 	return EventResponse{
-		ID:                      event.ID,
-		Title:                   event.Title,
-		Location:                event.Location,
-		StartsAt:                event.StartsAt,
-		RemindBeforeMinutes:     event.RemindBeforeMinutes,
-		RemindFrequencyMinutes:  event.RemindFrequencyMinutes,
-		RequireConfirmation:     event.RequireConfirmation,
-		MaxNotifications:        event.MaxNotifications,
-		Status:                  string(event.Status),
-		NotificationsSent:       event.NotificationsSent,
-		LastNotifiedAt:          event.LastNotifiedAt,
-		CreatedAt:               event.CreatedAt,
-		UpdatedAt:               event.UpdatedAt,
+		ID:                     event.ID,
+		Title:                  event.Title,
+		Location:               event.Location,
+		StartsAt:               event.StartsAt,
+		RemindBeforeMinutes:    event.RemindBeforeMinutes,
+		RemindFrequencyMinutes: event.RemindFrequencyMinutes,
+		RequireConfirmation:    event.RequireConfirmation,
+		MaxNotifications:       event.MaxNotifications,
+		Status:                 string(event.Status),
+		NotificationsSent:      event.NotificationsSent,
+		LastNotifiedAt:         event.LastNotifiedAt,
+		CreatedAt:              event.CreatedAt,
+		UpdatedAt:              event.UpdatedAt,
 	}
 }
 
 func UserToResponse(user *domain.User) UserResponse {
 	return UserResponse{
-		ID:                              user.ID,
-		WANumber:                        user.WANumber,
-		Name:                            user.Name,
-		Timezone:                        user.Timezone,
-		DefaultRemindBeforeMinutes:      user.DefaultRemindBeforeMinutes,
-		DefaultRemindFrequencyMinutes:   user.DefaultRemindFrequencyMinutes,
-		DefaultRequireConfirmation:      user.DefaultRequireConfirmation,
-		LLMProvider:                     user.LLMProvider,
-		LLMModel:                        user.LLMModel,
-		CreatedAt:                       user.CreatedAt,
-		UpdatedAt:                       user.UpdatedAt,
+		ID:                            user.ID,
+		WANumber:                      user.WANumber,
+		Name:                          user.Name,
+		Timezone:                      user.Timezone,
+		DefaultRemindBeforeMinutes:    user.DefaultRemindBeforeMinutes,
+		DefaultRemindFrequencyMinutes: user.DefaultRemindFrequencyMinutes,
+		DefaultRequireConfirmation:    user.DefaultRequireConfirmation,
+		LLMProvider:                   user.LLMProvider,
+		LLMModel:                      user.LLMModel,
+		CreatedAt:                     user.CreatedAt,
+		UpdatedAt:                     user.UpdatedAt,
 	}
 }
 

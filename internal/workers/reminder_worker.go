@@ -40,7 +40,7 @@ func NewReminderWorker(
 
 func (w *ReminderWorker) Start(ctx context.Context) error {
 	w.logger.Info("Starting reminder worker", zap.Duration("tick_interval", w.tickInterval))
-	
+
 	ticker := time.NewTicker(w.tickInterval)
 	defer ticker.Stop()
 

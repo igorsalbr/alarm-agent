@@ -25,7 +25,7 @@ func (r *UserRepository) GetByWANumber(ctx context.Context, waNumber string) (*d
 		       created_at, updated_at
 		FROM users 
 		WHERE wa_number = $1`
-	
+
 	err := r.db.GetContext(ctx, &user, query, waNumber)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -33,7 +33,7 @@ func (r *UserRepository) GetByWANumber(ctx context.Context, waNumber string) (*d
 		}
 		return nil, err
 	}
-	
+
 	return &user, nil
 }
 
@@ -44,17 +44,17 @@ func (r *UserRepository) Create(ctx context.Context, user *domain.User) error {
 		VALUES (:wa_number, :name, :timezone, :default_remind_before_minutes, 
 		        :default_remind_frequency_minutes, :default_require_confirmation)
 		RETURNING id, created_at, updated_at`
-	
+
 	rows, err := r.db.NamedExecContext(ctx, query, user)
 	if err != nil {
 		return err
 	}
-	
+
 	id, err := rows.LastInsertId()
 	if err == nil && id > 0 {
 		user.ID = int(id)
 	}
-	
+
 	return nil
 }
 
@@ -67,7 +67,7 @@ func (r *UserRepository) Update(ctx context.Context, user *domain.User) error {
 		    default_require_confirmation = :default_require_confirmation,
 		    updated_at = NOW()
 		WHERE id = :id`
-	
+
 	_, err := r.db.NamedExecContext(ctx, query, user)
 	return err
 }

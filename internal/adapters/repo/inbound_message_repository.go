@@ -20,24 +20,24 @@ func (r *InboundMessageRepository) Create(ctx context.Context, message *domain.I
 		INSERT INTO inbound_messages (provider_message_id, from_number, raw_payload)
 		VALUES (:provider_message_id, :from_number, :raw_payload)
 		RETURNING id, processed_at, created_at`
-	
+
 	rows, err := r.db.NamedExecContext(ctx, query, message)
 	if err != nil {
 		return err
 	}
-	
+
 	id, err := rows.LastInsertId()
 	if err == nil && id > 0 {
 		message.ID = int(id)
 	}
-	
+
 	return nil
 }
 
 func (r *InboundMessageRepository) Exists(ctx context.Context, providerMessageID string) (bool, error) {
 	var exists bool
 	query := "SELECT EXISTS(SELECT 1 FROM inbound_messages WHERE provider_message_id = $1)"
-	
+
 	err := r.db.GetContext(ctx, &exists, query, providerMessageID)
 	return exists, err
 }

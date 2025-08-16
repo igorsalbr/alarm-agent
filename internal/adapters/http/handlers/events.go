@@ -29,7 +29,7 @@ func (h *EventsHandler) CreateEvent(c *gin.Context) {
 	userID, exists := middleware.GetCurrentUserID(c)
 	if !exists {
 		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error: "unauthorized",
+			Error:   "unauthorized",
 			Message: "User not authenticated",
 		})
 		return
@@ -38,7 +38,7 @@ func (h *EventsHandler) CreateEvent(c *gin.Context) {
 	var req dto.CreateEventRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "invalid_request",
+			Error:   "invalid_request",
 			Message: err.Error(),
 		})
 		return
@@ -46,19 +46,19 @@ func (h *EventsHandler) CreateEvent(c *gin.Context) {
 
 	// Create event entities from request
 	entities := &domain.EventEntities{
-		Title:                   req.Title,
-		Location:                req.Location,
-		StartsAt:                &req.StartsAt,
-		RemindBeforeMinutes:     req.RemindBeforeMinutes,
-		RemindFrequencyMinutes:  req.RemindFrequencyMinutes,
-		RequireConfirmation:     req.RequireConfirmation,
-		MaxNotifications:        req.MaxNotifications,
+		Title:                  req.Title,
+		Location:               req.Location,
+		StartsAt:               &req.StartsAt,
+		RemindBeforeMinutes:    req.RemindBeforeMinutes,
+		RemindFrequencyMinutes: req.RemindFrequencyMinutes,
+		RequireConfirmation:    req.RequireConfirmation,
+		MaxNotifications:       req.MaxNotifications,
 	}
 
 	event, err := h.eventUseCase.CreateEvent(c.Request.Context(), userID, entities)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error: "create_failed",
+			Error:   "create_failed",
 			Message: err.Error(),
 		})
 		return
@@ -76,7 +76,7 @@ func (h *EventsHandler) GetEvent(c *gin.Context) {
 	userID, exists := middleware.GetCurrentUserID(c)
 	if !exists {
 		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error: "unauthorized",
+			Error:   "unauthorized",
 			Message: "User not authenticated",
 		})
 		return
@@ -86,7 +86,7 @@ func (h *EventsHandler) GetEvent(c *gin.Context) {
 	eventID, err := strconv.Atoi(eventIDStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "invalid_event_id",
+			Error:   "invalid_event_id",
 			Message: "Invalid event ID format",
 		})
 		return
@@ -95,7 +95,7 @@ func (h *EventsHandler) GetEvent(c *gin.Context) {
 	event, err := h.eventUseCase.GetEventByID(c.Request.Context(), userID, eventID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, dto.ErrorResponse{
-			Error: "event_not_found",
+			Error:   "event_not_found",
 			Message: err.Error(),
 		})
 		return
@@ -110,7 +110,7 @@ func (h *EventsHandler) UpdateEvent(c *gin.Context) {
 	userID, exists := middleware.GetCurrentUserID(c)
 	if !exists {
 		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error: "unauthorized",
+			Error:   "unauthorized",
 			Message: "User not authenticated",
 		})
 		return
@@ -120,7 +120,7 @@ func (h *EventsHandler) UpdateEvent(c *gin.Context) {
 	eventID, err := strconv.Atoi(eventIDStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "invalid_event_id",
+			Error:   "invalid_event_id",
 			Message: "Invalid event ID format",
 		})
 		return
@@ -129,7 +129,7 @@ func (h *EventsHandler) UpdateEvent(c *gin.Context) {
 	var req dto.UpdateEventRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "invalid_request",
+			Error:   "invalid_request",
 			Message: err.Error(),
 		})
 		return
@@ -140,19 +140,19 @@ func (h *EventsHandler) UpdateEvent(c *gin.Context) {
 		Identifier: &domain.EventIdentifier{
 			ID: &eventID,
 		},
-		Title:                   req.Title,
-		Location:                req.Location,
-		StartsAt:                req.StartsAt,
-		RemindBeforeMinutes:     req.RemindBeforeMinutes,
-		RemindFrequencyMinutes:  req.RemindFrequencyMinutes,
-		RequireConfirmation:     req.RequireConfirmation,
-		MaxNotifications:        req.MaxNotifications,
+		Title:                  req.Title,
+		Location:               req.Location,
+		StartsAt:               req.StartsAt,
+		RemindBeforeMinutes:    req.RemindBeforeMinutes,
+		RemindFrequencyMinutes: req.RemindFrequencyMinutes,
+		RequireConfirmation:    req.RequireConfirmation,
+		MaxNotifications:       req.MaxNotifications,
 	}
 
 	event, err := h.eventUseCase.UpdateEvent(c.Request.Context(), userID, entities)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error: "update_failed",
+			Error:   "update_failed",
 			Message: err.Error(),
 		})
 		return
@@ -170,7 +170,7 @@ func (h *EventsHandler) DeleteEvent(c *gin.Context) {
 	userID, exists := middleware.GetCurrentUserID(c)
 	if !exists {
 		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error: "unauthorized",
+			Error:   "unauthorized",
 			Message: "User not authenticated",
 		})
 		return
@@ -180,7 +180,7 @@ func (h *EventsHandler) DeleteEvent(c *gin.Context) {
 	eventID, err := strconv.Atoi(eventIDStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "invalid_event_id",
+			Error:   "invalid_event_id",
 			Message: "Invalid event ID format",
 		})
 		return
@@ -193,7 +193,7 @@ func (h *EventsHandler) DeleteEvent(c *gin.Context) {
 	event, err := h.eventUseCase.CancelEvent(c.Request.Context(), userID, identifier)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error: "delete_failed",
+			Error:   "delete_failed",
 			Message: err.Error(),
 		})
 		return
@@ -211,7 +211,7 @@ func (h *EventsHandler) ListEvents(c *gin.Context) {
 	userID, exists := middleware.GetCurrentUserID(c)
 	if !exists {
 		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error: "unauthorized", 
+			Error:   "unauthorized",
 			Message: "User not authenticated",
 		})
 		return
@@ -220,7 +220,7 @@ func (h *EventsHandler) ListEvents(c *gin.Context) {
 	var query dto.ListEventsQuery
 	if err := c.ShouldBindQuery(&query); err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "invalid_query",
+			Error:   "invalid_query",
 			Message: err.Error(),
 		})
 		return
@@ -239,7 +239,7 @@ func (h *EventsHandler) ListEvents(c *gin.Context) {
 	events, err := h.eventUseCase.ListEvents(c.Request.Context(), userID, query.StartDate, query.EndDate)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error: "list_failed",
+			Error:   "list_failed",
 			Message: err.Error(),
 		})
 		return
@@ -290,7 +290,7 @@ func (h *EventsHandler) ConfirmEvent(c *gin.Context) {
 	userID, exists := middleware.GetCurrentUserID(c)
 	if !exists {
 		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error: "unauthorized",
+			Error:   "unauthorized",
 			Message: "User not authenticated",
 		})
 		return
@@ -300,7 +300,7 @@ func (h *EventsHandler) ConfirmEvent(c *gin.Context) {
 	eventID, err := strconv.Atoi(eventIDStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "invalid_event_id",
+			Error:   "invalid_event_id",
 			Message: "Invalid event ID format",
 		})
 		return
@@ -313,7 +313,7 @@ func (h *EventsHandler) ConfirmEvent(c *gin.Context) {
 	event, err := h.eventUseCase.ConfirmEvent(c.Request.Context(), userID, identifier)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error: "confirm_failed",
+			Error:   "confirm_failed",
 			Message: err.Error(),
 		})
 		return

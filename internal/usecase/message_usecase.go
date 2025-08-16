@@ -15,11 +15,11 @@ import (
 )
 
 type MessageUseCase struct {
-	repos            ports.Repositories
-	whatsappSender   ports.WhatsAppSender
-	eventUseCase     *EventUseCase
-	defaultTimezone  string
-	config           *config.Config
+	repos           ports.Repositories
+	whatsappSender  ports.WhatsAppSender
+	eventUseCase    *EventUseCase
+	defaultTimezone string
+	config          *config.Config
 }
 
 func NewMessageUseCase(
@@ -76,10 +76,10 @@ func (uc *MessageUseCase) processWhitelistedMessage(ctx context.Context, parsedM
 	}
 
 	userPreferences := map[string]interface{}{
-		"timezone":                        user.Timezone,
-		"default_remind_before_minutes":   user.DefaultRemindBeforeMinutes,
+		"timezone":                         user.Timezone,
+		"default_remind_before_minutes":    user.DefaultRemindBeforeMinutes,
 		"default_remind_frequency_minutes": user.DefaultRemindFrequencyMinutes,
-		"default_require_confirmation":    user.DefaultRequireConfirmation,
+		"default_require_confirmation":     user.DefaultRequireConfirmation,
 	}
 
 	// Get LLM client from user's database configuration

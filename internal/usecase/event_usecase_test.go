@@ -106,63 +106,63 @@ func (m *MockRepositories) InboundMessage() interface{} {
 
 func TestEventUseCase_CreateEvent(t *testing.T) {
 	ctx := context.Background()
-	
+
 	mockRepos := &MockRepositories{
 		userRepo:  &MockUserRepository{},
 		eventRepo: &MockEventRepository{},
 	}
-	
+
 	useCase := NewEventUseCase(mockRepos)
-	
+
 	title := "Test Event"
 	startsAt := time.Now().Add(time.Hour)
-	
+
 	entities := &domain.EventEntities{
 		Title:    &title,
 		StartsAt: &startsAt,
 	}
-	
+
 	user := &domain.User{
-		ID:                              1,
-		WANumber:                        "+5511999999999",
-		DefaultRemindBeforeMinutes:      30,
-		DefaultRemindFrequencyMinutes:   15,
-		DefaultRequireConfirmation:      true,
+		ID:                            1,
+		WANumber:                      "+5511999999999",
+		DefaultRemindBeforeMinutes:    30,
+		DefaultRemindFrequencyMinutes: 15,
+		DefaultRequireConfirmation:    true,
 	}
-	
+
 	mockRepos.userRepo.On("GetByWANumber", ctx, mock.AnythingOfType("string")).Return(user, nil)
 	mockRepos.eventRepo.On("Create", ctx, mock.AnythingOfType("*domain.Event")).Return(nil)
-	
+
 	event, err := useCase.CreateEvent(ctx, 1, entities)
-	
+
 	assert.NoError(t, err)
 	assert.NotNil(t, event)
 	assert.Equal(t, title, event.Title)
 	assert.Equal(t, startsAt, event.StartsAt)
 	assert.Equal(t, domain.EventStatusScheduled, event.Status)
 	assert.Equal(t, user.DefaultRemindBeforeMinutes, event.RemindBeforeMinutes)
-	
+
 	mockRepos.eventRepo.AssertExpectations(t)
 }
 
 func TestEventUseCase_CreateEvent_MissingTitle(t *testing.T) {
 	ctx := context.Background()
-	
+
 	mockRepos := &MockRepositories{
 		userRepo:  &MockUserRepository{},
 		eventRepo: &MockEventRepository{},
 	}
-	
+
 	useCase := NewEventUseCase(mockRepos)
-	
+
 	startsAt := time.Now().Add(time.Hour)
-	
+
 	entities := &domain.EventEntities{
 		StartsAt: &startsAt,
 	}
-	
+
 	event, err := useCase.CreateEvent(ctx, 1, entities)
-	
+
 	assert.Error(t, err)
 	assert.Nil(t, event)
 	assert.Contains(t, err.Error(), "title is required")
@@ -170,22 +170,22 @@ func TestEventUseCase_CreateEvent_MissingTitle(t *testing.T) {
 
 func TestEventUseCase_CreateEvent_MissingStartTime(t *testing.T) {
 	ctx := context.Background()
-	
+
 	mockRepos := &MockRepositories{
 		userRepo:  &MockUserRepository{},
 		eventRepo: &MockEventRepository{},
 	}
-	
+
 	useCase := NewEventUseCase(mockRepos)
-	
+
 	title := "Test Event"
-	
+
 	entities := &domain.EventEntities{
 		Title: &title,
 	}
-	
+
 	event, err := useCase.CreateEvent(ctx, 1, entities)
-	
+
 	assert.Error(t, err)
 	assert.Nil(t, event)
 	assert.Contains(t, err.Error(), "start time is required")

@@ -12,18 +12,18 @@ import (
 )
 
 const (
-	UserContextKey = "user"
+	UserContextKey   = "user"
 	UserIDContextKey = "user_id"
 )
 
 type AuthMiddleware struct {
-	userRepo ports.UserRepository
+	userRepo      ports.UserRepository
 	whitelistRepo ports.WhitelistRepository
 }
 
 func NewAuthMiddleware(userRepo ports.UserRepository, whitelistRepo ports.WhitelistRepository) *AuthMiddleware {
 	return &AuthMiddleware{
-		userRepo: userRepo,
+		userRepo:      userRepo,
 		whitelistRepo: whitelistRepo,
 	}
 }
@@ -34,7 +34,7 @@ func (a *AuthMiddleware) AuthenticateByWANumber() gin.HandlerFunc {
 		waNumber := c.GetHeader("X-WA-Number")
 		if waNumber == "" {
 			c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-				Error: "missing_wa_number",
+				Error:   "missing_wa_number",
 				Message: "WhatsApp number is required in X-WA-Number header",
 			})
 			c.Abort()
@@ -48,7 +48,7 @@ func (a *AuthMiddleware) AuthenticateByWANumber() gin.HandlerFunc {
 		isWhitelisted, err := a.whitelistRepo.IsWhitelisted(c.Request.Context(), waNumber)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-				Error: "whitelist_check_failed",
+				Error:   "whitelist_check_failed",
 				Message: "Failed to verify WhatsApp number",
 			})
 			c.Abort()
@@ -57,7 +57,7 @@ func (a *AuthMiddleware) AuthenticateByWANumber() gin.HandlerFunc {
 
 		if !isWhitelisted {
 			c.JSON(http.StatusForbidden, dto.ErrorResponse{
-				Error: "number_not_whitelisted",
+				Error:   "number_not_whitelisted",
 				Message: "WhatsApp number is not authorized",
 			})
 			c.Abort()
@@ -68,7 +68,7 @@ func (a *AuthMiddleware) AuthenticateByWANumber() gin.HandlerFunc {
 		user, err := a.userRepo.GetByWANumber(c.Request.Context(), waNumber)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-				Error: "user_lookup_failed",
+				Error:   "user_lookup_failed",
 				Message: "Failed to lookup user",
 			})
 			c.Abort()
@@ -77,7 +77,7 @@ func (a *AuthMiddleware) AuthenticateByWANumber() gin.HandlerFunc {
 
 		if user == nil {
 			c.JSON(http.StatusNotFound, dto.ErrorResponse{
-				Error: "user_not_found",
+				Error:   "user_not_found",
 				Message: "User not found. Please send a WhatsApp message first to create your account.",
 			})
 			c.Abort()
@@ -97,7 +97,7 @@ func (a *AuthMiddleware) AuthenticateByUserID() gin.HandlerFunc {
 		userIDStr := c.Param("userId")
 		if userIDStr == "" {
 			c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-				Error: "missing_user_id",
+				Error:   "missing_user_id",
 				Message: "User ID is required",
 			})
 			c.Abort()
@@ -107,7 +107,7 @@ func (a *AuthMiddleware) AuthenticateByUserID() gin.HandlerFunc {
 		userID, err := strconv.Atoi(userIDStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-				Error: "invalid_user_id",
+				Error:   "invalid_user_id",
 				Message: "Invalid user ID format",
 			})
 			c.Abort()
@@ -119,7 +119,7 @@ func (a *AuthMiddleware) AuthenticateByUserID() gin.HandlerFunc {
 		if err != nil {
 			// Need to implement GetByID method
 			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-				Error: "user_lookup_failed", 
+				Error:   "user_lookup_failed",
 				Message: "Failed to lookup user",
 			})
 			c.Abort()
@@ -128,7 +128,7 @@ func (a *AuthMiddleware) AuthenticateByUserID() gin.HandlerFunc {
 
 		if user == nil || user.ID != userID {
 			c.JSON(http.StatusNotFound, dto.ErrorResponse{
-				Error: "user_not_found",
+				Error:   "user_not_found",
 				Message: "User not found",
 			})
 			c.Abort()

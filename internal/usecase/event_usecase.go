@@ -190,10 +190,10 @@ func (uc *EventUseCase) getUserByID(ctx context.Context, userID int) (*domain.Us
 	// This is a placeholder - we need to implement GetByID in UserRepository
 	// For now, we'll need to work around this limitation
 	return &domain.User{
-		ID:                              userID,
-		DefaultRemindBeforeMinutes:      30,
-		DefaultRemindFrequencyMinutes:   15,
-		DefaultRequireConfirmation:      true,
+		ID:                            userID,
+		DefaultRemindBeforeMinutes:    30,
+		DefaultRemindFrequencyMinutes: 15,
+		DefaultRequireConfirmation:    true,
 	}, nil
 }
 

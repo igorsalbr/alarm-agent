@@ -11,12 +11,12 @@ import (
 )
 
 type Config struct {
-	App       AppConfig
-	Database  DatabaseConfig
-	Infobip   InfobipConfig
-	LLM       LLMConfig
-	Security  SecurityConfig
-	Worker    WorkerConfig
+	App      AppConfig
+	Database DatabaseConfig
+	Infobip  InfobipConfig
+	LLM      LLMConfig
+	Security SecurityConfig
+	Worker   WorkerConfig
 }
 
 type AppConfig struct {
@@ -30,10 +30,10 @@ type DatabaseConfig struct {
 }
 
 type InfobipConfig struct {
-	BaseURL       string
-	APIKey        string
+	BaseURL        string
+	APIKey         string
 	WhatsAppSender string
-	WebhookSecret string
+	WebhookSecret  string
 }
 
 type LLMConfig struct {
@@ -66,10 +66,10 @@ func Load() (*Config, error) {
 			DSN: getEnvOrDefault("POSTGRES_DSN", "postgres://alarm_user:alarm_pass@localhost:5432/alarm_agent?sslmode=disable"),
 		},
 		Infobip: InfobipConfig{
-			BaseURL:       getEnvOrDefault("INFOBIP_BASE_URL", "https://api.infobip.com"),
-			APIKey:        os.Getenv("INFOBIP_API_KEY"),
+			BaseURL:        getEnvOrDefault("INFOBIP_BASE_URL", "https://api.infobip.com"),
+			APIKey:         os.Getenv("INFOBIP_API_KEY"),
 			WhatsAppSender: os.Getenv("INFOBIP_WHATSAPP_SENDER"),
-			WebhookSecret: os.Getenv("INFOBIP_WEBHOOK_SECRET"),
+			WebhookSecret:  os.Getenv("INFOBIP_WEBHOOK_SECRET"),
 		},
 		LLM: LLMConfig{
 			AnthropicKey: os.Getenv("ANTHROPIC_API_KEY"),
@@ -137,15 +137,15 @@ func parseWhitelistNumbers(numbersStr string) []string {
 	if numbersStr == "" {
 		return []string{}
 	}
-	
+
 	numbers := strings.Split(numbersStr, ",")
 	result := make([]string, 0, len(numbers))
-	
+
 	for _, number := range numbers {
 		if trimmed := strings.TrimSpace(number); trimmed != "" {
 			result = append(result, trimmed)
 		}
 	}
-	
+
 	return result
 }

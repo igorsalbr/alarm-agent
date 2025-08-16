@@ -27,17 +27,17 @@ func (r *EventRepository) Create(ctx context.Context, event *domain.Event) error
 		VALUES (:user_id, :title, :location, :starts_at, :remind_before_minutes, 
 		        :remind_frequency_minutes, :require_confirmation, :max_notifications, :status)
 		RETURNING id, created_at, updated_at`
-	
+
 	rows, err := r.db.NamedExecContext(ctx, query, event)
 	if err != nil {
 		return err
 	}
-	
+
 	id, err := rows.LastInsertId()
 	if err == nil && id > 0 {
 		event.ID = int(id)
 	}
-	
+
 	return nil
 }
 
@@ -54,7 +54,7 @@ func (r *EventRepository) Update(ctx context.Context, event *domain.Event) error
 		    last_notified_at = :last_notified_at,
 		    updated_at = NOW()
 		WHERE id = :id`
-	
+
 	_, err := r.db.NamedExecContext(ctx, query, event)
 	return err
 }
@@ -73,7 +73,7 @@ func (r *EventRepository) GetByID(ctx context.Context, id int) (*domain.Event, e
 		       status, notifications_sent, last_notified_at, created_at, updated_at
 		FROM events 
 		WHERE id = $1`
-	
+
 	err := r.db.GetContext(ctx, &event, query, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -81,7 +81,7 @@ func (r *EventRepository) GetByID(ctx context.Context, id int) (*domain.Event, e
 		}
 		return nil, err
 	}
-	
+
 	return &event, nil
 }
 
@@ -94,7 +94,7 @@ func (r *EventRepository) GetByUserID(ctx context.Context, userID int) ([]domain
 		FROM events 
 		WHERE user_id = $1
 		ORDER BY starts_at ASC`
-	
+
 	err := r.db.SelectContext(ctx, &events, query, userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -102,7 +102,7 @@ func (r *EventRepository) GetByUserID(ctx context.Context, userID int) ([]domain
 		}
 		return nil, err
 	}
-	
+
 	return events, nil
 }
 
@@ -115,7 +115,7 @@ func (r *EventRepository) GetByUserIDAndDateRange(ctx context.Context, userID in
 		FROM events 
 		WHERE user_id = $1 AND starts_at BETWEEN $2 AND $3
 		ORDER BY starts_at ASC`
-	
+
 	err := r.db.SelectContext(ctx, &events, query, userID, start, end)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -123,7 +123,7 @@ func (r *EventRepository) GetByUserIDAndDateRange(ctx context.Context, userID in
 		}
 		return nil, err
 	}
-	
+
 	return events, nil
 }
 
@@ -131,7 +131,7 @@ func (r *EventRepository) GetPendingReminders(ctx context.Context, reminderWindo
 	var eventsWithUsers []domain.EventWithUser
 	now := time.Now()
 	windowEnd := now.Add(reminderWindow)
-	
+
 	query := `
 		SELECT 
 		    e.id, e.user_id, e.title, e.location, e.starts_at, e.remind_before_minutes,
@@ -150,7 +150,7 @@ func (r *EventRepository) GetPendingReminders(ctx context.Context, reminderWindo
 		  AND (e.last_notified_at IS NULL 
 		       OR e.last_notified_at <= $1 - INTERVAL '1 minute' * e.remind_frequency_minutes)
 		ORDER BY e.starts_at ASC`
-	
+
 	err := r.db.SelectContext(ctx, &eventsWithUsers, query, now, windowEnd)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -158,7 +158,7 @@ func (r *EventRepository) GetPendingReminders(ctx context.Context, reminderWindo
 		}
 		return nil, err
 	}
-	
+
 	return eventsWithUsers, nil
 }
 
@@ -166,41 +166,41 @@ func (r *EventRepository) FindByUserAndIdentifier(ctx context.Context, userID in
 	var events []domain.Event
 	var conditions []string
 	var args []interface{}
-	
+
 	baseQuery := `
 		SELECT id, user_id, title, location, starts_at, remind_before_minutes,
 		       remind_frequency_minutes, require_confirmation, max_notifications,
 		       status, notifications_sent, last_notified_at, created_at, updated_at
 		FROM events 
 		WHERE user_id = $1`
-	
+
 	args = append(args, userID)
 	argIndex := 2
-	
+
 	if identifier.EventID != nil {
 		conditions = append(conditions, fmt.Sprintf("id = $%d", argIndex))
 		args = append(args, *identifier.EventID)
 		argIndex++
 	}
-	
+
 	if identifier.Title != nil {
 		conditions = append(conditions, fmt.Sprintf("LOWER(title) LIKE LOWER($%d)", argIndex))
 		args = append(args, "%"+*identifier.Title+"%")
 		argIndex++
 	}
-	
+
 	if identifier.DateHint != nil {
 		conditions = append(conditions, fmt.Sprintf("DATE(starts_at) = $%d", argIndex))
 		args = append(args, *identifier.DateHint)
 		argIndex++
 	}
-	
+
 	if len(conditions) > 0 {
 		baseQuery += " AND (" + strings.Join(conditions, " OR ") + ")"
 	}
-	
+
 	baseQuery += " ORDER BY starts_at ASC"
-	
+
 	err := r.db.SelectContext(ctx, &events, baseQuery, args...)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -208,6 +208,6 @@ func (r *EventRepository) FindByUserAndIdentifier(ctx context.Context, userID in
 		}
 		return nil, err
 	}
-	
+
 	return events, nil
 }

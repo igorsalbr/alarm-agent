@@ -12,12 +12,12 @@ import (
 )
 
 type PostgresRepositories struct {
-	db                   *sqlx.DB
-	userRepo             ports.UserRepository
-	whitelistRepo        ports.WhitelistRepository
-	eventRepo            ports.EventRepository
-	inboundMessageRepo   ports.InboundMessageRepository
-	llmConfigRepo        ports.LLMConfigRepository
+	db                 *sqlx.DB
+	userRepo           ports.UserRepository
+	whitelistRepo      ports.WhitelistRepository
+	eventRepo          ports.EventRepository
+	inboundMessageRepo ports.InboundMessageRepository
+	llmConfigRepo      ports.LLMConfigRepository
 }
 
 func NewPostgresRepositories(dsn string) (*PostgresRepositories, error) {
@@ -78,12 +78,12 @@ func (r *PostgresRepositories) WithTx(ctx context.Context, fn func(ports.Reposit
 	}()
 
 	txRepos := &PostgresRepositories{
-		db:                   tx,
-		userRepo:             NewUserRepository(tx),
-		whitelistRepo:        NewWhitelistRepository(tx),
-		eventRepo:            NewEventRepository(tx),
-		inboundMessageRepo:   NewInboundMessageRepository(tx),
-		llmConfigRepo:        NewLLMConfigRepository(tx),
+		db:                 tx,
+		userRepo:           NewUserRepository(tx),
+		whitelistRepo:      NewWhitelistRepository(tx),
+		eventRepo:          NewEventRepository(tx),
+		inboundMessageRepo: NewInboundMessageRepository(tx),
+		llmConfigRepo:      NewLLMConfigRepository(tx),
 	}
 
 	if err = fn(txRepos); err != nil {

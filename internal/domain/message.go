@@ -28,27 +28,27 @@ const (
 )
 
 type LLMResponse struct {
-	Intent            LLMIntent              `json:"intent"`
-	Entities          map[string]interface{} `json:"entities"`
-	Confidence        float64                `json:"confidence"`
-	FollowUpQuestion  *string                `json:"follow_up_question"`
-	Notes             *string                `json:"notes"`
+	Intent           LLMIntent              `json:"intent"`
+	Entities         map[string]interface{} `json:"entities"`
+	Confidence       float64                `json:"confidence"`
+	FollowUpQuestion *string                `json:"follow_up_question"`
+	Notes            *string                `json:"notes"`
 }
 
 type EventEntities struct {
-	Title                   *string    `json:"title"`
-	StartsAt                *time.Time `json:"starts_at"`
-	Location                *string    `json:"location"`
-	Participants            []string   `json:"participants"`
-	RemindBeforeMinutes     *int       `json:"remind_before_minutes"`
-	RemindFrequencyMinutes  *int       `json:"remind_frequency_minutes"`
-	RequireConfirmation     *bool      `json:"require_confirmation"`
-	MaxNotifications        *int       `json:"max_notifications"`
-	Identifier              *EventIdentifier `json:"identifier"`
+	Title                  *string          `json:"title"`
+	StartsAt               *time.Time       `json:"starts_at"`
+	Location               *string          `json:"location"`
+	Participants           []string         `json:"participants"`
+	RemindBeforeMinutes    *int             `json:"remind_before_minutes"`
+	RemindFrequencyMinutes *int             `json:"remind_frequency_minutes"`
+	RequireConfirmation    *bool            `json:"require_confirmation"`
+	MaxNotifications       *int             `json:"max_notifications"`
+	Identifier             *EventIdentifier `json:"identifier"`
 }
 
 type EventIdentifier struct {
-	EventID   *int    `json:"event_id"`
-	Title     *string `json:"title"`
-	DateHint  *string `json:"date_hint"`
+	EventID  *int    `json:"event_id"`
+	Title    *string `json:"title"`
+	DateHint *string `json:"date_hint"`
 }

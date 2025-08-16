@@ -3,7 +3,7 @@ module github.com/alarm-agent
 go 1.22
 
 require (
-	github.com/anthropic-ai/anthropic-go v1.0.0
+	github.com/liushuangls/go-anthropic v0.7.4
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-migrate/migrate/v4 v4.17.0
 	github.com/jmoiron/sqlx v1.3.5

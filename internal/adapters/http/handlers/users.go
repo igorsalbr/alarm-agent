@@ -27,7 +27,7 @@ func (h *UsersHandler) GetProfile(c *gin.Context) {
 	user := middleware.GetCurrentUser(c)
 	if user == nil {
 		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error: "unauthorized",
+			Error:   "unauthorized",
 			Message: "User not authenticated",
 		})
 		return
@@ -43,7 +43,7 @@ func (h *UsersHandler) UpdateProfile(c *gin.Context) {
 	user := middleware.GetCurrentUser(c)
 	if user == nil {
 		c.JSON(http.StatusUnauthorized, dto.ErrorResponse{
-			Error: "unauthorized",
+			Error:   "unauthorized",
 			Message: "User not authenticated",
 		})
 		return
@@ -54,7 +54,7 @@ func (h *UsersHandler) UpdateProfile(c *gin.Context) {
 	var req dto.UpdateUserProfileRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "invalid_request",
+			Error:   "invalid_request",
 			Message: err.Error(),
 		})
 		return
@@ -85,7 +85,7 @@ func (h *UsersHandler) UpdateProfile(c *gin.Context) {
 
 	if err := h.userRepo.Update(c.Request.Context(), domainUser); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error: "update_failed",
+			Error:   "update_failed",
 			Message: err.Error(),
 		})
 		return
@@ -103,7 +103,7 @@ func (h *UsersHandler) AuthenticateUser(c *gin.Context) {
 	var req dto.AuthenticateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "invalid_request",
+			Error:   "invalid_request",
 			Message: err.Error(),
 		})
 		return
@@ -112,7 +112,7 @@ func (h *UsersHandler) AuthenticateUser(c *gin.Context) {
 	user, err := h.userRepo.GetByWANumber(c.Request.Context(), req.WANumber)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error: "lookup_failed",
+			Error:   "lookup_failed",
 			Message: "Failed to lookup user",
 		})
 		return
@@ -120,7 +120,7 @@ func (h *UsersHandler) AuthenticateUser(c *gin.Context) {
 
 	if user == nil {
 		c.JSON(http.StatusNotFound, dto.ErrorResponse{
-			Error: "user_not_found",
+			Error:   "user_not_found",
 			Message: "User not found. Please send a WhatsApp message first to create your account.",
 		})
 		return

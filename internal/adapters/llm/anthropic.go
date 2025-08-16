@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/anthropic-ai/anthropic-go"
+	"github.com/liushuangls/go-anthropic/v2"
 
 	"github.com/alarm-agent/internal/domain"
 	"github.com/alarm-agent/internal/ports"
@@ -29,7 +29,7 @@ func (c *AnthropicClient) Chat(ctx context.Context, systemPrompt, userMessage st
 	defer cancel()
 
 	message := anthropic.MessageRequest{
-		Model: c.model,
+		Model:     c.model,
 		MaxTokens: 1024,
 		System: []anthropic.SystemMessage{{
 			Text: systemPrompt,
@@ -54,7 +54,7 @@ func (c *AnthropicClient) Chat(ctx context.Context, systemPrompt, userMessage st
 	}
 
 	content := response.Content[0].Text
-	
+
 	var llmResponse domain.LLMResponse
 	if err := json.Unmarshal([]byte(content), &llmResponse); err != nil {
 		return &domain.LLMResponse{

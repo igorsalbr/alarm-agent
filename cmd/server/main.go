@@ -161,8 +161,8 @@ func initializeWhitelist(repos *repo.PostgresRepositories, cfg *config.Config, l
 				Note:   nil, // Could add a note like "Added from config"
 			}
 			if err := repos.Whitelist().Add(ctx, whitelist); err != nil {
-				logger.Error("Failed to add number to whitelist", 
-					zap.String("number", number), 
+				logger.Error("Failed to add number to whitelist",
+					zap.String("number", number),
 					zap.Error(err))
 			} else {
 				logger.Info("Added number to whitelist", zap.String("number", number))

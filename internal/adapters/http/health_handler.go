@@ -36,7 +36,7 @@ func (h *HealthHandler) Ready(c *gin.Context) {
 	defer cancel()
 
 	checks := map[string]string{}
-	
+
 	if _, err := h.repos.User().GetByWANumber(ctx, "health-check"); err != nil {
 		if err.Error() != "sql: no rows in result set" {
 			checks["database"] = "unhealthy"
@@ -50,7 +50,7 @@ func (h *HealthHandler) Ready(c *gin.Context) {
 
 	overall := "healthy"
 	statusCode := http.StatusOK
-	
+
 	for _, status := range checks {
 		if status != "healthy" {
 			overall = "unhealthy"

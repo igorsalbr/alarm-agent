@@ -40,8 +40,8 @@ func NewMetrics() *Metrics {
 			Help: "Total number of reminders sent",
 		}),
 		HTTPRequestDuration: promauto.NewHistogramVec(prometheus.HistogramOpts{
-			Name: "http_request_duration_seconds",
-			Help: "Duration of HTTP requests in seconds",
+			Name:    "http_request_duration_seconds",
+			Help:    "Duration of HTTP requests in seconds",
 			Buckets: []float64{0.1, 0.25, 0.5, 1, 2.5, 5, 10},
 		}, []string{"method", "path", "status_code"}),
 		HTTPRequestsTotal: promauto.NewCounterVec(prometheus.CounterOpts{

@@ -66,16 +66,16 @@ func BuildSystemPrompt(timezone string) string {
 
 func BuildUserMessage(fromNumber, messageText string, userPreferences map[string]interface{}) string {
 	var parts []string
-	
+
 	parts = append(parts, fmt.Sprintf("Número: %s", fromNumber))
 	parts = append(parts, fmt.Sprintf("Mensagem: %s", messageText))
-	
+
 	if len(userPreferences) > 0 {
 		parts = append(parts, "Preferências do usuário:")
 		for key, value := range userPreferences {
 			parts = append(parts, fmt.Sprintf("- %s: %v", key, value))
 		}
 	}
-	
+
 	return strings.Join(parts, "\n")
 }

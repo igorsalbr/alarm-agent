@@ -11,23 +11,23 @@ type InfobipWebhookRequest struct {
 }
 
 type InfobipInboundMessage struct {
-	MessageID   string                 `json:"messageId"`
-	From        string                 `json:"from"`
-	To          string                 `json:"to"`
-	ReceivedAt  time.Time              `json:"receivedAt"`
-	Message     InfobipMessageContent  `json:"message"`
-	Contact     *InfobipContact        `json:"contact,omitempty"`
-	Price       *InfobipPrice          `json:"price,omitempty"`
+	MessageID  string                `json:"messageId"`
+	From       string                `json:"from"`
+	To         string                `json:"to"`
+	ReceivedAt time.Time             `json:"receivedAt"`
+	Message    InfobipMessageContent `json:"message"`
+	Contact    *InfobipContact       `json:"contact,omitempty"`
+	Price      *InfobipPrice         `json:"price,omitempty"`
 }
 
 type InfobipMessageContent struct {
-	Type      string                 `json:"type"`
-	Text      *string                `json:"text,omitempty"`
-	Image     *InfobipMediaContent   `json:"image,omitempty"`
-	Document  *InfobipMediaContent   `json:"document,omitempty"`
-	Audio     *InfobipMediaContent   `json:"audio,omitempty"`
-	Video     *InfobipMediaContent   `json:"video,omitempty"`
-	Location  *InfobipLocationContent `json:"location,omitempty"`
+	Type     string                  `json:"type"`
+	Text     *string                 `json:"text,omitempty"`
+	Image    *InfobipMediaContent    `json:"image,omitempty"`
+	Document *InfobipMediaContent    `json:"document,omitempty"`
+	Audio    *InfobipMediaContent    `json:"audio,omitempty"`
+	Video    *InfobipMediaContent    `json:"video,omitempty"`
+	Location *InfobipLocationContent `json:"location,omitempty"`
 }
 
 type InfobipMediaContent struct {
@@ -53,7 +53,7 @@ type InfobipPrice struct {
 
 func (r *InfobipWebhookRequest) ExtractMessages() []ParsedMessage {
 	var messages []ParsedMessage
-	
+
 	for _, result := range r.Results {
 		message := ParsedMessage{
 			ID:        result.MessageID,
@@ -62,7 +62,7 @@ func (r *InfobipWebhookRequest) ExtractMessages() []ParsedMessage {
 			Timestamp: result.ReceivedAt,
 			Type:      result.Message.Type,
 		}
-		
+
 		switch result.Message.Type {
 		case "TEXT":
 			if result.Message.Text != nil {
@@ -87,21 +87,21 @@ func (r *InfobipWebhookRequest) ExtractMessages() []ParsedMessage {
 				if result.Message.Location.Address != nil {
 					locationData["address"] = *result.Message.Location.Address
 				}
-				
+
 				locationJSON, _ := json.Marshal(locationData)
 				message.Text = string(locationJSON)
 			}
 		default:
 			message.Text = fmt.Sprintf("Unsupported message type: %s", result.Message.Type)
 		}
-		
+
 		if result.Contact != nil {
 			message.ContactName = result.Contact.Name
 		}
-		
+
 		messages = append(messages, message)
 	}
-	
+
 	return messages
 }
 

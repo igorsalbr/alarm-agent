@@ -16,7 +16,7 @@ func LoggingMiddleware(logger *zap.Logger) gin.HandlerFunc {
 
 func RateLimitMiddleware(requestsPerMinute int) gin.HandlerFunc {
 	limiter := rate.NewLimiter(rate.Limit(requestsPerMinute)/60, requestsPerMinute)
-	
+
 	return func(c *gin.Context) {
 		if !limiter.Allow() {
 			c.JSON(http.StatusTooManyRequests, gin.H{

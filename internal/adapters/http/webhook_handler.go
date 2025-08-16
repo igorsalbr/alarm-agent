@@ -40,7 +40,7 @@ func (h *WebhookHandler) HandleWhatsAppWebhook(c *gin.Context) {
 
 	signature := c.GetHeader("X-Signature-256")
 	if !h.verifier.VerifySignature(body, signature) {
-		h.logger.Warn("Invalid webhook signature", 
+		h.logger.Warn("Invalid webhook signature",
 			zap.String("signature", signature),
 			zap.String("from", c.ClientIP()),
 		)

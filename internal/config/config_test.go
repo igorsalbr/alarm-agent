@@ -173,7 +173,7 @@ func TestConfig_IsDevelopment(t *testing.T) {
 			Environment: "development",
 		},
 	}
-	
+
 	assert.True(t, config.IsDevelopment())
 	assert.False(t, config.IsProduction())
 }
@@ -184,7 +184,7 @@ func TestConfig_IsProduction(t *testing.T) {
 			Environment: "production",
 		},
 	}
-	
+
 	assert.False(t, config.IsDevelopment())
 	assert.True(t, config.IsProduction())
 }
@@ -193,15 +193,15 @@ func TestGetEnvOrDefault(t *testing.T) {
 	key := "TEST_ENV_VAR"
 	defaultValue := "default"
 	testValue := "test"
-	
+
 	// Test default value when env var is not set
 	result := getEnvOrDefault(key, defaultValue)
 	assert.Equal(t, defaultValue, result)
-	
+
 	// Test env var value when set
 	os.Setenv(key, testValue)
 	defer os.Unsetenv(key)
-	
+
 	result = getEnvOrDefault(key, defaultValue)
 	assert.Equal(t, testValue, result)
 }
@@ -210,18 +210,18 @@ func TestGetEnvAsIntOrDefault(t *testing.T) {
 	key := "TEST_INT_ENV_VAR"
 	defaultValue := 42
 	testValue := "123"
-	
+
 	// Test default value when env var is not set
 	result := getEnvAsIntOrDefault(key, defaultValue)
 	assert.Equal(t, defaultValue, result)
-	
+
 	// Test env var value when set to valid int
 	os.Setenv(key, testValue)
 	defer os.Unsetenv(key)
-	
+
 	result = getEnvAsIntOrDefault(key, defaultValue)
 	assert.Equal(t, 123, result)
-	
+
 	// Test default value when env var is set to invalid int
 	os.Setenv(key, "invalid")
 	result = getEnvAsIntOrDefault(key, defaultValue)

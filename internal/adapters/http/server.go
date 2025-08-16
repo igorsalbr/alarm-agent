@@ -18,12 +18,12 @@ import (
 )
 
 type Server struct {
-	config        *config.Config
-	repos         ports.Repositories
-	eventUseCase  *usecase.EventUseCase
-	logger        *zap.Logger
-	router        *gin.Engine
-	server        *http.Server
+	config       *config.Config
+	repos        ports.Repositories
+	eventUseCase *usecase.EventUseCase
+	logger       *zap.Logger
+	router       *gin.Engine
+	server       *http.Server
 }
 
 func NewServer(
@@ -67,7 +67,7 @@ func (s *Server) setupRoutes(messageUseCase *usecase.MessageUseCase, verifier po
 
 	s.router.GET("/health", healthHandler.Health)
 	s.router.GET("/ready", healthHandler.Ready)
-	
+
 	s.router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	webhookGroup := s.router.Group("/webhook")
@@ -133,15 +133,15 @@ func (s *Server) setupDevelopmentRoutes() {
 }
 
 func (s *Server) Start() error {
-	s.logger.Info("Starting HTTP server", 
+	s.logger.Info("Starting HTTP server",
 		zap.String("address", s.server.Addr),
 		zap.String("environment", s.config.App.Environment),
 	)
-	
+
 	if err := s.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		return fmt.Errorf("failed to start server: %w", err)
 	}
-	
+
 	return nil
 }
 

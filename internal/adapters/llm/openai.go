@@ -53,7 +53,7 @@ func (c *OpenAIClient) Chat(ctx context.Context, systemPrompt, userMessage strin
 	}
 
 	content := response.Choices[0].Message.Content
-	
+
 	var llmResponse domain.LLMResponse
 	if err := json.Unmarshal([]byte(content), &llmResponse); err != nil {
 		return &domain.LLMResponse{
