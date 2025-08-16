@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -15,14 +14,12 @@ type Config struct {
 	Database DatabaseConfig
 	Infobip  InfobipConfig
 	LLM      LLMConfig
-	Security SecurityConfig
 	Worker   WorkerConfig
 }
 
 type AppConfig struct {
-	Port            string
-	Environment     string
-	DefaultTimezone string
+	Port        string
+	Environment string
 }
 
 type DatabaseConfig struct {
@@ -42,10 +39,6 @@ type LLMConfig struct {
 	OpenAIKey    string
 }
 
-type SecurityConfig struct {
-	WhitelistNumbers   []string
-	RateLimitPerMinute int
-}
 
 type WorkerConfig struct {
 	ReminderTickInterval time.Duration
@@ -58,9 +51,8 @@ func Load() (*Config, error) {
 
 	config := &Config{
 		App: AppConfig{
-			Port:            getEnvOrDefault("PORT", "8080"),
-			Environment:     getEnvOrDefault("ENV", "development"),
-			DefaultTimezone: getEnvOrDefault("TIMEZONE_DEFAULT", "America/Sao_Paulo"),
+			Port:        getEnvOrDefault("PORT", "8080"),
+			Environment: getEnvOrDefault("ENV", "development"),
 		},
 		Database: DatabaseConfig{
 			DSN: getEnvOrDefault("POSTGRES_DSN", "postgres://alarm_user:alarm_pass@localhost:5432/alarm_agent?sslmode=disable"),
@@ -74,10 +66,6 @@ func Load() (*Config, error) {
 		LLM: LLMConfig{
 			AnthropicKey: os.Getenv("ANTHROPIC_API_KEY"),
 			OpenAIKey:    os.Getenv("OPENAI_API_KEY"),
-		},
-		Security: SecurityConfig{
-			WhitelistNumbers:   parseWhitelistNumbers(os.Getenv("WHITELIST_NUMBERS")),
-			RateLimitPerMinute: getEnvAsIntOrDefault("RATE_LIMIT_PER_MINUTE", 30),
 		},
 		Worker: WorkerConfig{
 			ReminderTickInterval: time.Duration(getEnvAsIntOrDefault("REMINDER_TICK_SECONDS", 30)) * time.Second,
@@ -101,10 +89,7 @@ func (c *Config) Validate() error {
 	}
 
 	// LLM configuration is now handled by database, no validation needed here
-
-	if len(c.Security.WhitelistNumbers) == 0 {
-		return fmt.Errorf("WHITELIST_NUMBERS must contain at least one number")
-	}
+	// Whitelist is now handled at user level, no validation needed here
 
 	return nil
 }
@@ -133,19 +118,3 @@ func getEnvAsIntOrDefault(key string, defaultValue int) int {
 	return defaultValue
 }
 
-func parseWhitelistNumbers(numbersStr string) []string {
-	if numbersStr == "" {
-		return []string{}
-	}
-
-	numbers := strings.Split(numbersStr, ",")
-	result := make([]string, 0, len(numbers))
-
-	for _, number := range numbers {
-		if trimmed := strings.TrimSpace(number); trimmed != "" {
-			result = append(result, trimmed)
-		}
-	}
-
-	return result
-}

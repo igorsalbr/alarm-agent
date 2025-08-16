@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/alarm-agent/internal/adapters/llm"
 	"github.com/alarm-agent/internal/adapters/whatsapp"
@@ -58,22 +57,21 @@ func (uc *MessageUseCase) ProcessInboundMessage(ctx context.Context, parsedMessa
 		return fmt.Errorf("failed to create inbound message: %w", err)
 	}
 
-	isWhitelisted, err := uc.repos.Whitelist().IsWhitelisted(ctx, parsedMessage.From)
-	if err != nil {
-		return fmt.Errorf("failed to check whitelist: %w", err)
-	}
-	if !isWhitelisted {
-		return nil
-	}
-
-	return uc.processWhitelistedMessage(ctx, parsedMessage)
-}
-
-func (uc *MessageUseCase) processWhitelistedMessage(ctx context.Context, parsedMessage whatsapp.ParsedMessage) error {
+	// Get or create user - this automatically creates users who send messages
 	user, err := uc.getOrCreateUser(ctx, parsedMessage.From, parsedMessage.ContactName)
 	if err != nil {
 		return fmt.Errorf("failed to get or create user: %w", err)
 	}
+
+	// Check if user is active
+	if !user.IsActive {
+		return nil // Ignore messages from inactive users
+	}
+
+	return uc.processUserMessage(ctx, user, parsedMessage)
+}
+
+func (uc *MessageUseCase) processUserMessage(ctx context.Context, user *domain.User, parsedMessage whatsapp.ParsedMessage) error {
 
 	userPreferences := map[string]interface{}{
 		"timezone":                         user.Timezone,
@@ -258,6 +256,8 @@ func (uc *MessageUseCase) getOrCreateUser(ctx context.Context, waNumber, contact
 		DefaultRemindBeforeMinutes:    30,
 		DefaultRemindFrequencyMinutes: 15,
 		DefaultRequireConfirmation:    true,
+		RateLimitPerMinute:            30,
+		IsActive:                      true,
 	}
 
 	if contactName != "" {

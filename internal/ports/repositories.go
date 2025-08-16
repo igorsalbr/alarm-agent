@@ -9,8 +9,10 @@ import (
 
 type UserRepository interface {
 	GetByWANumber(ctx context.Context, waNumber string) (*domain.User, error)
+	GetByID(ctx context.Context, userID int) (*domain.User, error)
 	Create(ctx context.Context, user *domain.User) error
 	Update(ctx context.Context, user *domain.User) error
+	UpdateConfig(ctx context.Context, userID int, config *domain.UserConfig) error
 }
 
 type WhitelistRepository interface {
@@ -44,10 +46,20 @@ type LLMConfigRepository interface {
 	GetUserLLMConfig(ctx context.Context, userID int) (*domain.LLMModel, error)
 }
 
+type UserAllowedContactRepository interface {
+	IsAllowed(ctx context.Context, userID int, contactNumber string) (bool, error)
+	Add(ctx context.Context, contact *domain.UserAllowedContact) error
+	Remove(ctx context.Context, userID int, contactNumber string) error
+	List(ctx context.Context, userID int) ([]domain.UserAllowedContact, error)
+	GetByUserAndNumber(ctx context.Context, userID int, contactNumber string) (*domain.UserAllowedContact, error)
+}
+
 type Repositories interface {
 	User() UserRepository
 	Whitelist() WhitelistRepository
 	Event() EventRepository
 	InboundMessage() InboundMessageRepository
 	LLMConfig() LLMConfigRepository
+	UserAllowedContact() UserAllowedContactRepository
+	WithTx(ctx context.Context, fn func(Repositories) error) error
 }

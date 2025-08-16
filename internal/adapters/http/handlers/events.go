@@ -3,7 +3,6 @@ package handlers
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -46,7 +45,7 @@ func (h *EventsHandler) CreateEvent(c *gin.Context) {
 
 	// Create event entities from request
 	entities := &domain.EventEntities{
-		Title:                  req.Title,
+		Title:                  &req.Title,
 		Location:               req.Location,
 		StartsAt:               &req.StartsAt,
 		RemindBeforeMinutes:    req.RemindBeforeMinutes,
@@ -138,7 +137,7 @@ func (h *EventsHandler) UpdateEvent(c *gin.Context) {
 	// Create event entities with ID for update
 	entities := &domain.EventEntities{
 		Identifier: &domain.EventIdentifier{
-			ID: &eventID,
+			EventID: &eventID,
 		},
 		Title:                  req.Title,
 		Location:               req.Location,
@@ -187,7 +186,7 @@ func (h *EventsHandler) DeleteEvent(c *gin.Context) {
 	}
 
 	identifier := &domain.EventIdentifier{
-		ID: &eventID,
+		EventID: &eventID,
 	}
 
 	event, err := h.eventUseCase.CancelEvent(c.Request.Context(), userID, identifier)
@@ -307,7 +306,7 @@ func (h *EventsHandler) ConfirmEvent(c *gin.Context) {
 	}
 
 	identifier := &domain.EventIdentifier{
-		ID: &eventID,
+		EventID: &eventID,
 	}
 
 	event, err := h.eventUseCase.ConfirmEvent(c.Request.Context(), userID, identifier)

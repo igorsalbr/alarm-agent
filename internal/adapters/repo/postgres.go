@@ -12,12 +12,13 @@ import (
 )
 
 type PostgresRepositories struct {
-	db                 *sqlx.DB
-	userRepo           ports.UserRepository
-	whitelistRepo      ports.WhitelistRepository
-	eventRepo          ports.EventRepository
-	inboundMessageRepo ports.InboundMessageRepository
-	llmConfigRepo      ports.LLMConfigRepository
+	db                      *sqlx.DB
+	userRepo                ports.UserRepository
+	whitelistRepo           ports.WhitelistRepository
+	eventRepo               ports.EventRepository
+	inboundMessageRepo      ports.InboundMessageRepository
+	llmConfigRepo           ports.LLMConfigRepository
+	userAllowedContactRepo  ports.UserAllowedContactRepository
 }
 
 func NewPostgresRepositories(dsn string) (*PostgresRepositories, error) {
@@ -37,6 +38,7 @@ func NewPostgresRepositories(dsn string) (*PostgresRepositories, error) {
 	repo.eventRepo = NewEventRepository(db)
 	repo.inboundMessageRepo = NewInboundMessageRepository(db)
 	repo.llmConfigRepo = NewLLMConfigRepository(db)
+	repo.userAllowedContactRepo = NewUserAllowedContactRepository(db)
 
 	return repo, nil
 }
@@ -65,6 +67,10 @@ func (r *PostgresRepositories) LLMConfig() ports.LLMConfigRepository {
 	return r.llmConfigRepo
 }
 
+func (r *PostgresRepositories) UserAllowedContact() ports.UserAllowedContactRepository {
+	return r.userAllowedContactRepo
+}
+
 func (r *PostgresRepositories) WithTx(ctx context.Context, fn func(ports.Repositories) error) error {
 	tx, err := r.db.BeginTxx(ctx, nil)
 	if err != nil {
@@ -78,12 +84,13 @@ func (r *PostgresRepositories) WithTx(ctx context.Context, fn func(ports.Reposit
 	}()
 
 	txRepos := &PostgresRepositories{
-		db:                 tx,
-		userRepo:           NewUserRepository(tx),
-		whitelistRepo:      NewWhitelistRepository(tx),
-		eventRepo:          NewEventRepository(tx),
-		inboundMessageRepo: NewInboundMessageRepository(tx),
-		llmConfigRepo:      NewLLMConfigRepository(tx),
+		db:                     r.db,
+		userRepo:               NewUserRepository(tx),
+		whitelistRepo:          NewWhitelistRepository(tx),
+		eventRepo:              NewEventRepository(tx),
+		inboundMessageRepo:     NewInboundMessageRepository(tx),
+		llmConfigRepo:          NewLLMConfigRepository(tx),
+		userAllowedContactRepo: NewUserAllowedContactRepository(tx),
 	}
 
 	if err = fn(txRepos); err != nil {

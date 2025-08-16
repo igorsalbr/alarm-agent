@@ -12,11 +12,9 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/alarm-agent/internal/adapters/http"
-	"github.com/alarm-agent/internal/adapters/llm"
 	"github.com/alarm-agent/internal/adapters/repo"
 	"github.com/alarm-agent/internal/adapters/whatsapp"
 	"github.com/alarm-agent/internal/config"
-	"github.com/alarm-agent/internal/domain"
 	"github.com/alarm-agent/internal/infra"
 	"github.com/alarm-agent/internal/usecase"
 	"github.com/alarm-agent/internal/workers"
@@ -52,9 +50,7 @@ func run() error {
 	}
 	defer repos.Close()
 
-	if err := initializeWhitelist(repos, cfg, logger); err != nil {
-		logger.Warn("Failed to initialize whitelist", zap.Error(err))
-	}
+	// Whitelist initialization is no longer needed - users are managed at the database level
 
 	// LLM client is now created per-request from database configuration
 
@@ -72,7 +68,7 @@ func run() error {
 		repos,
 		whatsappSender,
 		eventUseCase,
-		cfg.App.DefaultTimezone,
+		"America/Sao_Paulo", // Default timezone - users can change this in their profile
 		cfg,
 	)
 
@@ -146,29 +142,3 @@ func run() error {
 
 // getLLMAPIKey function removed - API keys are now stored in database
 
-func initializeWhitelist(repos *repo.PostgresRepositories, cfg *config.Config, logger *zap.Logger) error {
-	ctx := context.Background()
-
-	for _, number := range cfg.Security.WhitelistNumbers {
-		exists, err := repos.Whitelist().IsWhitelisted(ctx, number)
-		if err != nil {
-			return err
-		}
-
-		if !exists {
-			whitelist := &domain.WhitelistNumber{
-				Number: number,
-				Note:   nil, // Could add a note like "Added from config"
-			}
-			if err := repos.Whitelist().Add(ctx, whitelist); err != nil {
-				logger.Error("Failed to add number to whitelist",
-					zap.String("number", number),
-					zap.Error(err))
-			} else {
-				logger.Info("Added number to whitelist", zap.String("number", number))
-			}
-		}
-	}
-
-	return nil
-}

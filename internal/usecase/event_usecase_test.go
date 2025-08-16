@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/alarm-agent/internal/domain"
+	"github.com/alarm-agent/internal/ports"
 )
 
 type MockUserRepository struct {
@@ -23,6 +24,14 @@ func (m *MockUserRepository) GetByWANumber(ctx context.Context, waNumber string)
 	return args.Get(0).(*domain.User), args.Error(1)
 }
 
+func (m *MockUserRepository) GetByID(ctx context.Context, userID int) (*domain.User, error) {
+	args := m.Called(ctx, userID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.User), args.Error(1)
+}
+
 func (m *MockUserRepository) Create(ctx context.Context, user *domain.User) error {
 	args := m.Called(ctx, user)
 	return args.Error(0)
@@ -30,6 +39,11 @@ func (m *MockUserRepository) Create(ctx context.Context, user *domain.User) erro
 
 func (m *MockUserRepository) Update(ctx context.Context, user *domain.User) error {
 	args := m.Called(ctx, user)
+	return args.Error(0)
+}
+
+func (m *MockUserRepository) UpdateConfig(ctx context.Context, userID int, config *domain.UserConfig) error {
+	args := m.Called(ctx, userID, config)
 	return args.Error(0)
 }
 
@@ -88,20 +102,32 @@ type MockRepositories struct {
 	eventRepo *MockEventRepository
 }
 
-func (m *MockRepositories) User() *MockUserRepository {
+func (m *MockRepositories) User() ports.UserRepository {
 	return m.userRepo
 }
 
-func (m *MockRepositories) Event() *MockEventRepository {
+func (m *MockRepositories) Event() ports.EventRepository {
 	return m.eventRepo
 }
 
-func (m *MockRepositories) Whitelist() interface{} {
+func (m *MockRepositories) Whitelist() ports.WhitelistRepository {
 	return nil
 }
 
-func (m *MockRepositories) InboundMessage() interface{} {
+func (m *MockRepositories) InboundMessage() ports.InboundMessageRepository {
 	return nil
+}
+
+func (m *MockRepositories) LLMConfig() ports.LLMConfigRepository {
+	return nil
+}
+
+func (m *MockRepositories) UserAllowedContact() ports.UserAllowedContactRepository {
+	return nil
+}
+
+func (m *MockRepositories) WithTx(ctx context.Context, fn func(ports.Repositories) error) error {
+	return fn(m)
 }
 
 func TestEventUseCase_CreateEvent(t *testing.T) {

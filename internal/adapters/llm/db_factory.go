@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/alarm-agent/internal/config"
-	"github.com/alarm-agent/internal/domain"
 	"github.com/alarm-agent/internal/ports"
 )
 

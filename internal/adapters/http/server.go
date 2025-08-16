@@ -42,7 +42,7 @@ func NewServer(
 	router.Use(gin.Recovery())
 	router.Use(LoggingMiddleware(logger))
 	router.Use(CORSMiddleware())
-	router.Use(RateLimitMiddleware(cfg.Security.RateLimitPerMinute))
+	router.Use(RateLimitMiddleware(60)) // Global rate limit of 60 requests per minute
 	router.Use(TimeoutMiddleware(30 * time.Second))
 
 	server := &Server{
@@ -88,9 +88,10 @@ func (s *Server) setupAPIRoutes() {
 	eventsHandler := handlers.NewEventsHandler(s.eventUseCase)
 	usersHandler := handlers.NewUsersHandler(s.repos.User())
 	llmHandler := handlers.NewLLMHandler(s.repos.LLMConfig())
+	userConfigHandler := handlers.NewUserConfigHandler(s.repos)
 
 	// Initialize auth middleware
-	authMiddleware := middleware.NewAuthMiddleware(s.repos.User(), s.repos.Whitelist())
+	authMiddleware := middleware.NewAuthMiddleware(s.repos.User())
 
 	// Public routes (no authentication required)
 	publicAPI := s.router.Group("/api/v1")
@@ -108,6 +109,15 @@ func (s *Server) setupAPIRoutes() {
 		// User profile routes
 		protectedAPI.GET("/profile", usersHandler.GetProfile)
 		protectedAPI.PUT("/profile", usersHandler.UpdateProfile)
+
+		// User configuration routes
+		protectedAPI.GET("/user/config", userConfigHandler.GetUserConfig)
+		protectedAPI.PUT("/user/config", userConfigHandler.UpdateUserConfig)
+		
+		// User allowed contacts routes
+		protectedAPI.GET("/user/allowed-contacts", userConfigHandler.ListAllowedContacts)
+		protectedAPI.POST("/user/allowed-contacts", userConfigHandler.AddAllowedContact)
+		protectedAPI.DELETE("/user/allowed-contacts/:contactNumber", userConfigHandler.RemoveAllowedContact)
 
 		// Events routes
 		protectedAPI.POST("/events", eventsHandler.CreateEvent)

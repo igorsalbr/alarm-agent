@@ -17,18 +17,16 @@ const (
 )
 
 type AuthMiddleware struct {
-	userRepo      ports.UserRepository
-	whitelistRepo ports.WhitelistRepository
+	userRepo ports.UserRepository
 }
 
-func NewAuthMiddleware(userRepo ports.UserRepository, whitelistRepo ports.WhitelistRepository) *AuthMiddleware {
+func NewAuthMiddleware(userRepo ports.UserRepository) *AuthMiddleware {
 	return &AuthMiddleware{
-		userRepo:      userRepo,
-		whitelistRepo: whitelistRepo,
+		userRepo: userRepo,
 	}
 }
 
-// AuthenticateByWANumber validates that the WhatsApp number is whitelisted and gets/creates the user
+// AuthenticateByWANumber validates that the user exists and is active
 func (a *AuthMiddleware) AuthenticateByWANumber() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		waNumber := c.GetHeader("X-WA-Number")
@@ -44,27 +42,7 @@ func (a *AuthMiddleware) AuthenticateByWANumber() gin.HandlerFunc {
 		// Clean the phone number format
 		waNumber = strings.TrimSpace(waNumber)
 
-		// Check if number is whitelisted
-		isWhitelisted, err := a.whitelistRepo.IsWhitelisted(c.Request.Context(), waNumber)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-				Error:   "whitelist_check_failed",
-				Message: "Failed to verify WhatsApp number",
-			})
-			c.Abort()
-			return
-		}
-
-		if !isWhitelisted {
-			c.JSON(http.StatusForbidden, dto.ErrorResponse{
-				Error:   "number_not_whitelisted",
-				Message: "WhatsApp number is not authorized",
-			})
-			c.Abort()
-			return
-		}
-
-		// Get or create user
+		// Get user by WhatsApp number
 		user, err := a.userRepo.GetByWANumber(c.Request.Context(), waNumber)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
@@ -79,6 +57,16 @@ func (a *AuthMiddleware) AuthenticateByWANumber() gin.HandlerFunc {
 			c.JSON(http.StatusNotFound, dto.ErrorResponse{
 				Error:   "user_not_found",
 				Message: "User not found. Please send a WhatsApp message first to create your account.",
+			})
+			c.Abort()
+			return
+		}
+
+		// Check if user is active
+		if !user.IsActive {
+			c.JSON(http.StatusForbidden, dto.ErrorResponse{
+				Error:   "user_inactive",
+				Message: "User account is inactive",
 			})
 			c.Abort()
 			return

@@ -19,7 +19,7 @@ type AnthropicClient struct {
 
 func NewAnthropicClient(apiKey, model string) ports.LLMClient {
 	return &AnthropicClient{
-		client: anthropic.NewClient(anthropic.WithAPIKey(apiKey)),
+		client: anthropic.NewClient(apiKey),
 		model:  model,
 	}
 }
@@ -28,23 +28,17 @@ func (c *AnthropicClient) Chat(ctx context.Context, systemPrompt, userMessage st
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
-	message := anthropic.MessageRequest{
+	message := anthropic.MessagesRequest{
 		Model:     c.model,
 		MaxTokens: 1024,
-		System: []anthropic.SystemMessage{{
-			Text: systemPrompt,
-		}},
-		Messages: []anthropic.Message{{
-			Role: anthropic.RoleUser,
-			Content: []anthropic.MessageContent{{
-				Type: "text",
-				Text: userMessage,
-			}},
-		}},
-		Temperature: anthropic.Float(0.1),
+		System:    systemPrompt,
+		Messages: []anthropic.Message{
+			anthropic.NewUserTextMessage(userMessage),
+		},
+		Temperature: &[]float32{0.1}[0],
 	}
 
-	response, err := c.client.Messages.New(ctx, message)
+	response, err := c.client.CreateMessages(ctx, message)
 	if err != nil {
 		return nil, fmt.Errorf("anthropic API error: %w", err)
 	}
@@ -53,7 +47,7 @@ func (c *AnthropicClient) Chat(ctx context.Context, systemPrompt, userMessage st
 		return nil, fmt.Errorf("empty response from anthropic")
 	}
 
-	content := response.Content[0].Text
+	content := *response.Content[0].Text
 
 	var llmResponse domain.LLMResponse
 	if err := json.Unmarshal([]byte(content), &llmResponse); err != nil {

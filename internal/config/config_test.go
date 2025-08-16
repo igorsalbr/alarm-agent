@@ -7,46 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParseWhitelistNumbers(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected []string
-	}{
-		{
-			name:     "empty string",
-			input:    "",
-			expected: []string{},
-		},
-		{
-			name:     "single number",
-			input:    "+5511999999999",
-			expected: []string{"+5511999999999"},
-		},
-		{
-			name:     "multiple numbers",
-			input:    "+5511999999999,+5511888888888,+5511777777777",
-			expected: []string{"+5511999999999", "+5511888888888", "+5511777777777"},
-		},
-		{
-			name:     "numbers with spaces",
-			input:    " +5511999999999 , +5511888888888 , +5511777777777 ",
-			expected: []string{"+5511999999999", "+5511888888888", "+5511777777777"},
-		},
-		{
-			name:     "empty entries",
-			input:    "+5511999999999,,+5511888888888",
-			expected: []string{"+5511999999999", "+5511888888888"},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := parseWhitelistNumbers(tt.input)
-			assert.Equal(t, tt.expected, result)
-		})
-	}
-}
+// parseWhitelistNumbers function removed - whitelist is now user-level
 
 func TestConfig_Validate(t *testing.T) {
 	tests := []struct {
@@ -62,11 +23,7 @@ func TestConfig_Validate(t *testing.T) {
 					WhatsAppSender: "test-sender",
 				},
 				LLM: LLMConfig{
-					Provider:     "anthropic",
 					AnthropicKey: "test-anthropic-key",
-				},
-				Security: SecurityConfig{
-					WhitelistNumbers: []string{"+5511999999999"},
 				},
 			},
 			expectedErr: "",
@@ -78,11 +35,7 @@ func TestConfig_Validate(t *testing.T) {
 					WhatsAppSender: "test-sender",
 				},
 				LLM: LLMConfig{
-					Provider:     "anthropic",
 					AnthropicKey: "test-anthropic-key",
-				},
-				Security: SecurityConfig{
-					WhitelistNumbers: []string{"+5511999999999"},
 				},
 			},
 			expectedErr: "INFOBIP_API_KEY is required",
@@ -94,63 +47,36 @@ func TestConfig_Validate(t *testing.T) {
 					APIKey: "test-key",
 				},
 				LLM: LLMConfig{
-					Provider:     "anthropic",
 					AnthropicKey: "test-anthropic-key",
-				},
-				Security: SecurityConfig{
-					WhitelistNumbers: []string{"+5511999999999"},
 				},
 			},
 			expectedErr: "INFOBIP_WHATSAPP_SENDER is required",
 		},
 		{
-			name: "invalid llm provider",
+			name: "no llm validation needed",
 			config: Config{
 				Infobip: InfobipConfig{
 					APIKey:         "test-key",
 					WhatsAppSender: "test-sender",
 				},
 				LLM: LLMConfig{
-					Provider: "invalid-provider",
-				},
-				Security: SecurityConfig{
-					WhitelistNumbers: []string{"+5511999999999"},
+					AnthropicKey: "",
+					OpenAIKey:    "",
 				},
 			},
-			expectedErr: "LLM_PROVIDER must be 'anthropic' or 'openai'",
+			expectedErr: "",
 		},
 		{
-			name: "missing anthropic key when using anthropic",
+			name: "missing anthropic key is ok - handled by database",
 			config: Config{
 				Infobip: InfobipConfig{
 					APIKey:         "test-key",
 					WhatsAppSender: "test-sender",
 				},
 				LLM: LLMConfig{
-					Provider: "anthropic",
-				},
-				Security: SecurityConfig{
-					WhitelistNumbers: []string{"+5511999999999"},
 				},
 			},
-			expectedErr: "ANTHROPIC_API_KEY is required when using anthropic provider",
-		},
-		{
-			name: "empty whitelist",
-			config: Config{
-				Infobip: InfobipConfig{
-					APIKey:         "test-key",
-					WhatsAppSender: "test-sender",
-				},
-				LLM: LLMConfig{
-					Provider:     "anthropic",
-					AnthropicKey: "test-anthropic-key",
-				},
-				Security: SecurityConfig{
-					WhitelistNumbers: []string{},
-				},
-			},
-			expectedErr: "WHITELIST_NUMBERS must contain at least one number",
+			expectedErr: "",
 		},
 	}
 
