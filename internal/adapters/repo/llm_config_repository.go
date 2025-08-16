@@ -134,7 +134,7 @@ func (r *LLMConfigRepository) GetUserLLMConfig(ctx context.Context, userID int) 
 	}
 
 	// If user has no custom config (null values), use default
-	if result.LLMModel.ID == 0 {
+	if result.ID == 0 {
 		return r.GetDefaultModel(ctx)
 	}
 

@@ -81,7 +81,7 @@ func (w *ReminderWorker) processReminders(ctx context.Context) error {
 		if err := w.processEventReminder(ctx, &eventWithUser); err != nil {
 			w.logger.Error("Failed to process event reminder",
 				zap.Error(err),
-				zap.Int("event_id", eventWithUser.Event.ID),
+				zap.Int("event_id", eventWithUser.ID),
 				zap.String("user_number", eventWithUser.User.WANumber),
 			)
 		}

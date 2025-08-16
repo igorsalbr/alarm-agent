@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"sync"
@@ -37,7 +38,11 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("failed to create logger: %w", err)
 	}
-	defer logger.Sync()
+	defer func() {
+		if err := logger.Sync(); err != nil {
+			log.Printf("failed to sync logger: %v", err)
+		}
+	}()
 
 	logger.Info("Starting Alarm Agent",
 		zap.String("environment", cfg.App.Environment),
@@ -48,7 +53,11 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("failed to create repositories: %w", err)
 	}
-	defer repos.Close()
+	defer func() {
+		if err := repos.Close(); err != nil {
+			log.Printf("Failed to close repositories: %v", err)
+		}
+	}()
 
 	// Whitelist initialization is no longer needed - users are managed at the database level
 

@@ -125,8 +125,8 @@ func TestGetEnvOrDefault(t *testing.T) {
 	assert.Equal(t, defaultValue, result)
 
 	// Test env var value when set
-	os.Setenv(key, testValue)
-	defer os.Unsetenv(key)
+	_ = os.Setenv(key, testValue)
+	defer func() { _ = os.Unsetenv(key) }()
 
 	result = getEnvOrDefault(key, defaultValue)
 	assert.Equal(t, testValue, result)
@@ -142,14 +142,14 @@ func TestGetEnvAsIntOrDefault(t *testing.T) {
 	assert.Equal(t, defaultValue, result)
 
 	// Test env var value when set to valid int
-	os.Setenv(key, testValue)
-	defer os.Unsetenv(key)
+	_ = os.Setenv(key, testValue)
+	defer func() { _ = os.Unsetenv(key) }()
 
 	result = getEnvAsIntOrDefault(key, defaultValue)
 	assert.Equal(t, 123, result)
 
 	// Test default value when env var is set to invalid int
-	os.Setenv(key, "invalid")
+	_ = os.Setenv(key, "invalid")
 	result = getEnvAsIntOrDefault(key, defaultValue)
 	assert.Equal(t, defaultValue, result)
 }

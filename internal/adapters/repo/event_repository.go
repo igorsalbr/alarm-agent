@@ -192,7 +192,6 @@ func (r *EventRepository) FindByUserAndIdentifier(ctx context.Context, userID in
 	if identifier.DateHint != nil {
 		conditions = append(conditions, fmt.Sprintf("DATE(starts_at) = $%d", argIndex))
 		args = append(args, *identifier.DateHint)
-		argIndex++
 	}
 
 	if len(conditions) > 0 {

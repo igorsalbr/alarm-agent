@@ -12,13 +12,13 @@ import (
 )
 
 type PostgresRepositories struct {
-	db                      *sqlx.DB
-	userRepo                ports.UserRepository
-	whitelistRepo           ports.WhitelistRepository
-	eventRepo               ports.EventRepository
-	inboundMessageRepo      ports.InboundMessageRepository
-	llmConfigRepo           ports.LLMConfigRepository
-	userAllowedContactRepo  ports.UserAllowedContactRepository
+	db                     *sqlx.DB
+	userRepo               ports.UserRepository
+	whitelistRepo          ports.WhitelistRepository
+	eventRepo              ports.EventRepository
+	inboundMessageRepo     ports.InboundMessageRepository
+	llmConfigRepo          ports.LLMConfigRepository
+	userAllowedContactRepo ports.UserAllowedContactRepository
 }
 
 func NewPostgresRepositories(dsn string) (*PostgresRepositories, error) {
@@ -79,7 +79,9 @@ func (r *PostgresRepositories) WithTx(ctx context.Context, fn func(ports.Reposit
 
 	defer func() {
 		if err != nil {
-			tx.Rollback()
+			if rbErr := tx.Rollback(); rbErr != nil {
+				err = fmt.Errorf("rollback failed: %v, original error: %w", rbErr, err)
+			}
 		}
 	}()
 
